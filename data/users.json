@@ -1,0 +1,30 @@
+[
+  {
+    "id": "57f35f10-3f70-4672-9500-91872a850016",
+    "name": "Carnot Francisco Manuel",
+    "email": "juniorfranciscomanuel2019@gmail.com",
+    "phone": "927560090",
+    "passwordHash": "4ae49c2ff0a3f240e695934d47a57569:ba966c0d0ab725bc017a2a06c55ad9da62a82fc68fdd5da89513d83399ea20dd45a1d29c6d690d467b176bcc9a4ccbe2b2032cb90964517250fdf3109d647b14",
+    "licenseKey": "MSP-E7486787-0BE82649-0708FD66-7D2117E2",
+    "status": "activo",
+    "trialStartDate": "2026-04-07T18:21:41.298Z",
+    "trialExpiresAt": "2026-04-21T18:21:41.298Z",
+    "createdAt": "2026-04-07T18:21:41.298Z",
+    "updatedAt": "2026-04-07T18:24:10.928Z",
+    "activatedAt": "2026-04-07T18:24:10.928Z",
+    "expiresAt": "2026-05-07T18:24:10.928Z",
+    "paymentMethod": "express",
+    "paymentRef": "972575533",
+    "payments": [
+      {
+        "date": "2026-04-07T18:24:10.928Z",
+        "method": "express",
+        "ref": "972575533",
+        "amount": "10.000 Kz",
+        "status": "confirmado"
+      }
+    ],
+    "emailsSent": [],
+    "devices": []
+  }
+]
