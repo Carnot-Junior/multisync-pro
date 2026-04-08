@@ -8,7 +8,7 @@
  * Retorna: { valid, expiresAt, userName, daysLeft, renewUrl }
  */
 
-const { readUsers, writeUsers } = require('../../../lib/auth');
+const { readUsers, writeUsers } = require('../../lib/auth');
 
 const TRIAL_DAYS = 14;
 

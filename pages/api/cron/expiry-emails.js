@@ -12,8 +12,8 @@
  * Avisos enviados: 7 dias antes, 1 dia antes, e no dia da expiração.
  */
 
-const { readUsers, writeUsers } = require('../../../../lib/auth');
-const { sendEmail, emailExpiryWarning, emailExpired } = require('../../../../lib/email');
+const { readUsers, writeUsers } = require('../../../lib/auth');
+const { sendEmail, emailExpiryWarning, emailExpired } = require('../../../lib/email');
 
 export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).end();
