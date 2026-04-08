@@ -4,6 +4,21 @@ import Link from 'next/link';
 
 const DOWNLOADS = [
   {
+    platform: 'Plugin Universal (.ccx)',
+    version: '1.0.0',
+    requirement: 'Windows & macOS · Adobe Premiere Pro 2025+',
+    filename: 'MultiSyncPro_v1.0.0.ccx',
+    size: '~58 KB',
+    url: '/files/MultiSyncPro_v1.0.0.ccx',
+    available: true,
+    badge: 'Recomendado',
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-8 h-8" fill="#22d46a">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    ),
+  },
+  {
     platform: 'Windows',
     version: '1.0.0',
     requirement: 'Windows 10 / 11 · Adobe Premiere Pro 2025+',
@@ -33,6 +48,14 @@ const DOWNLOADS = [
       </svg>
     ),
   },
+];
+
+const STEPS_CCX = [
+  { n: 1, title: 'Descarrega o ficheiro .ccx', desc: 'Clica no botão "Plugin Universal" acima e guarda o ficheiro .ccx.' },
+  { n: 2, title: 'Dá duplo-clique no ficheiro', desc: 'O Creative Cloud abre automaticamente e pergunta se queres instalar.' },
+  { n: 3, title: 'Clica em Instalar', desc: 'O Creative Cloud instala o plugin para todos os teus produtos Adobe.' },
+  { n: 4, title: 'Abre o Premiere Pro 2025', desc: 'Vai a Janela → Extensões → MultiSync Pro.' },
+  { n: 5, title: 'Activa a tua licença', desc: 'Insere a chave de licença que recebeste após o pagamento.' },
 ];
 
 const STEPS_WIN = [
