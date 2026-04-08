@@ -253,14 +253,14 @@ export default function Dashboard() {
               </p>
               <div className="space-y-3">
                 <a
-                  href="/files/MultiSyncPro_Setup_v1.0.exe"
+                  href="/files/MultiSyncPro_Setup_v1.0.0.exe"
                   download
                   className="flex items-center gap-3 w-full bg-[#5b5fff] hover:bg-[#4a4eee] text-white text-sm font-bold px-4 py-3 rounded-xl transition-colors"
                 >
                   <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Windows — MultiSyncPro_Setup_v1.0.exe
+                  Windows — MultiSyncPro_Setup_v1.0.0.exe
                 </a>
                 <Link
                   href="/download"

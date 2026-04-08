@@ -11,6 +11,7 @@
  */
 
 const { getSessionUser, readUsers, writeUsers, publicUser } = require('../../../lib/auth');
+const { sendEmail, emailWelcome } = require('../../../lib/email');
 
 export default function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
@@ -71,6 +72,9 @@ export default function handler(req, res) {
   };
 
   writeUsers(users);
+
+  // Email de confirmação de activação
+  sendEmail(emailWelcome(users[idx])).catch(() => {});
 
   return res.status(200).json({
     licenseKey: users[idx].licenseKey,
