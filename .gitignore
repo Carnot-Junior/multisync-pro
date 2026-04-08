@@ -18,6 +18,10 @@ data/sessions.json
 .DS_Store
 Thumbs.db
 
+# Binários grandes (hospedados no GitHub Releases)
+public/files/*.exe
+public/files/*.command
+
 # Logs
 *.log
 npm-debug.log*

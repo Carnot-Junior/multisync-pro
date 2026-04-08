@@ -253,7 +253,7 @@ export default function Dashboard() {
               </p>
               <div className="space-y-3">
                 <a
-                  href="/files/MultiSyncPro_Setup_v1.0.0.exe"
+                  href="https://github.com/Carnot-Junior/multisync-pro/releases/download/v1.0.0/MultiSyncPro_Setup_v1.0.0.exe"
                   download
                   className="flex items-center gap-3 w-full bg-[#5b5fff] hover:bg-[#4a4eee] text-white text-sm font-bold px-4 py-3 rounded-xl transition-colors"
                 >
@@ -262,6 +262,13 @@ export default function Dashboard() {
                   </svg>
                   Windows — MultiSyncPro_Setup_v1.0.0.exe
                 </a>
+                {/* SmartScreen notice */}
+                <div className="bg-[#f5c842]/5 border border-[#f5c842]/20 rounded-xl p-3">
+                  <p className="text-[#f5c842] text-xs font-semibold mb-1">⚠ Aviso do Windows SmartScreen</p>
+                  <p className="text-white/50 text-xs leading-relaxed">
+                    Se o Windows mostrar um aviso de segurança, clica em <strong className="text-white/70">"Mais informações"</strong> e depois em <strong className="text-white/70">"Executar assim mesmo"</strong>. O instalador é seguro.
+                  </p>
+                </div>
                 <Link
                   href="/download"
                   className="block text-center text-white/40 hover:text-white text-xs transition-colors"

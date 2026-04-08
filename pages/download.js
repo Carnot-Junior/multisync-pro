@@ -23,8 +23,8 @@ const DOWNLOADS = [
     version: '1.0.0',
     requirement: 'Windows 10 / 11 · Adobe Premiere Pro 2025+',
     filename: 'MultiSyncPro_Setup_v1.0.0.exe',
-    size: '~180 MB',
-    url: '/files/MultiSyncPro_Setup_v1.0.0.exe',
+    size: '~76 MB',
+    url: 'https://github.com/Carnot-Junior/multisync-pro/releases/download/v1.0.0/MultiSyncPro_Setup_v1.0.0.exe',
     available: true,
     badge: null,
     icon: (
@@ -60,10 +60,11 @@ const STEPS_CCX = [
 
 const STEPS_WIN = [
   { n: 1, title: 'Descarrega o instalador', desc: 'Clica no botão Windows acima e guarda o ficheiro .exe.' },
-  { n: 2, title: 'Executa como Administrador', desc: 'Clica com o botão direito no .exe e selecciona "Executar como administrador".' },
-  { n: 3, title: 'Segue o assistente', desc: 'O instalador verifica e instala FFmpeg e Python automaticamente.' },
-  { n: 4, title: 'Abre o Premiere Pro 2025', desc: 'Vai a Janela → Extensões → MultiSync Pro.' },
-  { n: 5, title: 'Insere a chave de licença', desc: 'Copia a chave do teu dashboard e cola no ecrã de activação do plugin.' },
+  { n: 2, title: 'Aviso do SmartScreen (normal)', desc: 'Se o Windows mostrar "O Windows protegeu o seu PC", clica em "Mais informações" → "Executar assim mesmo". O ficheiro é seguro.' },
+  { n: 3, title: 'Executa como Administrador', desc: 'Clica com o botão direito no .exe e selecciona "Executar como administrador".' },
+  { n: 4, title: 'Segue o assistente', desc: 'O instalador verifica e instala FFmpeg e Python automaticamente.' },
+  { n: 5, title: 'Abre o Premiere Pro 2025', desc: 'Vai a Janela → Extensões → MultiSync Pro.' },
+  { n: 6, title: 'Insere a chave de licença', desc: 'Copia a chave do teu dashboard e cola no ecrã de activação do plugin.' },
 ];
 
 const STEPS_MAC = [
