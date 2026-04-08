@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     return res.status(429).json({ message: 'Demasiados pedidos. Aguarda um momento.' });
   }
 
-  const user = getSessionUser(req);
+  const user = await getSessionUser(req);
   if (!user) return res.status(401).json({ message: 'Sessão inválida. Faz login primeiro.' });
 
   const { mobile, type = 'new' } = req.body || {};
@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       amountKz: AMOUNT_KZ,
     });
 
-    savePending({
+    await savePending({
       transactionId: tx.id,
       userId:        user.id,
       type,

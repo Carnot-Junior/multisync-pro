@@ -14,7 +14,7 @@ const { getTransaction }    = require('../../../../lib/proxypay');
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
-  const user = getSessionUser(req);
+  const user = await getSessionUser(req);
   if (!user) return res.status(401).json({ message: 'Sessão inválida.' });
 
   const { id } = req.query;
