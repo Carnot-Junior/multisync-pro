@@ -21,10 +21,9 @@ const { sendEmail, emailWelcome }           = require('../../../lib/email');
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  // ── Verificar secret no query param ──────────────────────────────────────
-  const { secret } = req.query;
-  if (!verifyWebhookSecret(secret)) {
-    console.warn('[Proxypay callback] Secret inválido:', secret);
+  // ── Verificar secret no Authorization header ─────────────────────────────
+  if (!verifyWebhookSecret(req)) {
+    console.warn('[Proxypay callback] Secret inválido');
     return res.status(401).json({ error: 'Unauthorized' });
   }
 

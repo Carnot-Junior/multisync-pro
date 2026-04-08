@@ -1,27 +1,37 @@
 /**
- * GET /api/cron/expiry-emails?secret=<CRON_SECRET>
+ * POST /api/cron/expiry-emails
  *
  * Envia emails automáticos de aviso de expiração.
- * Chamar diariamente com um cron job:
- *   curl "https://multisyncpro.com/api/cron/expiry-emails?secret=SEU_SECRET"
+ * Chamar diariamente com Authorization header:
+ *   curl -X POST -H "Authorization: Bearer SEU_SECRET" \
+ *     https://multisync-pro-xqei.vercel.app/api/cron/expiry-emails
  *
  * Configurar em .env:
  *   CRON_SECRET=uma-string-secreta-longa
  *
- * Em produção usar Vercel Cron, GitHub Actions ou crontab.
  * Avisos enviados: 7 dias antes, 1 dia antes, e no dia da expiração.
  */
 
+const crypto = require('crypto');
 const { readUsers, writeUsers } = require('../../../lib/auth');
 const { sendEmail, emailExpiryWarning, emailExpired } = require('../../../lib/email');
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET' && req.method !== 'POST') return res.status(405).end();
+  if (req.method !== 'POST') return res.status(405).end();
 
-  // Protecção por secret
-  const secret = req.query.secret || req.body?.secret;
-  if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  // Protecção por Authorization header (Bearer token)
+  const cronSecret = process.env.CRON_SECRET || '';
+  const authHeader = req.headers['authorization'] || '';
+  const token      = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+
+  if (cronSecret) {
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    try {
+      const valid = crypto.timingSafeEqual(Buffer.from(token), Buffer.from(cronSecret));
+      if (!valid) return res.status(401).json({ error: 'Unauthorized' });
+    } catch {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
   }
 
   const users  = readUsers();
