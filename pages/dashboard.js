@@ -254,7 +254,8 @@ export default function Dashboard() {
               <div className="space-y-3">
                 <a
                   href="https://github.com/Carnot-Junior/multisync-pro/releases/download/v1.0.0/MultiSyncPro_Setup_v1.0.0.exe"
-                  download
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-3 w-full bg-[#5b5fff] hover:bg-[#4a4eee] text-white text-sm font-bold px-4 py-3 rounded-xl transition-colors"
                 >
                   <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

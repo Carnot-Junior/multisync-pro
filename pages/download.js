@@ -156,7 +156,8 @@ export default function Download() {
                   {d.available ? (
                     <a
                       href={d.url}
-                      download={d.filename}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
                       className="flex-shrink-0 bg-[#5b5fff] hover:bg-[#4a4eee] text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-colors"
                     >
