@@ -13,13 +13,12 @@
  */
 
 const crypto = require('crypto');
-const { readUsers, writeUsers } = require('../../../lib/auth');
+const { readUsers, updateUser } = require('../../../lib/auth');
 const { sendEmail, emailExpiryWarning, emailExpired } = require('../../../lib/email');
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  // Protecção por Authorization header (Bearer token)
   const cronSecret = process.env.CRON_SECRET || '';
   const authHeader = req.headers['authorization'] || '';
   const token      = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
@@ -34,65 +33,54 @@ export default async function handler(req, res) {
     }
   }
 
-  const users  = readUsers();
-  const now    = new Date();
+  const users   = await readUsers();
+  const now     = new Date();
   const results = [];
-  let   dirty  = false;
 
-  for (let idx = 0; idx < users.length; idx++) {
-    const user = users[idx];
-
-    // Só processar utilizadores activos com email e data de expiração
+  for (const user of users) {
     if (user.status !== 'activo' || !user.expiresAt || !user.email) continue;
 
-    const expiresAt = new Date(user.expiresAt);
-    const daysLeft  = Math.ceil((expiresAt - now) / 86400000);
+    const expiresAt  = new Date(user.expiresAt);
+    const daysLeft   = Math.ceil((expiresAt - now) / 86400000);
+    const emailsSent = Array.isArray(user.emailsSent) ? [...user.emailsSent] : [];
+    let   dirty      = false;
 
-    // Inicializar array de emails enviados
-    if (!Array.isArray(users[idx].emailsSent)) users[idx].emailsSent = [];
-
-    // ── Expirado hoje (daysLeft ≤ 0) ──────────────────────────────────────────
     if (daysLeft <= 0) {
       const key = `expired_${expiresAt.toISOString().slice(0, 10)}`;
-      if (!users[idx].emailsSent.includes(key)) {
+      if (!emailsSent.includes(key)) {
         const r = await sendEmail(emailExpired(user));
         results.push({ email: user.email, type: 'expired', ok: r.ok });
-        users[idx].emailsSent.push(key);
+        emailsSent.push(key);
         dirty = true;
       }
-      continue;
-    }
-
-    // ── 7 dias antes ──────────────────────────────────────────────────────────
-    if (daysLeft === 7) {
+    } else if (daysLeft === 7) {
       const key = `warning7_${expiresAt.toISOString().slice(0, 10)}`;
-      if (!users[idx].emailsSent.includes(key)) {
+      if (!emailsSent.includes(key)) {
         const r = await sendEmail(emailExpiryWarning(user, 7));
         results.push({ email: user.email, type: 'warning7', ok: r.ok });
-        users[idx].emailsSent.push(key);
+        emailsSent.push(key);
+        dirty = true;
+      }
+    } else if (daysLeft === 1) {
+      const key = `warning1_${expiresAt.toISOString().slice(0, 10)}`;
+      if (!emailsSent.includes(key)) {
+        const r = await sendEmail(emailExpiryWarning(user, 1));
+        results.push({ email: user.email, type: 'warning1', ok: r.ok });
+        emailsSent.push(key);
         dirty = true;
       }
     }
 
-    // ── 1 dia antes ───────────────────────────────────────────────────────────
-    if (daysLeft === 1) {
-      const key = `warning1_${expiresAt.toISOString().slice(0, 10)}`;
-      if (!users[idx].emailsSent.includes(key)) {
-        const r = await sendEmail(emailExpiryWarning(user, 1));
-        results.push({ email: user.email, type: 'warning1', ok: r.ok });
-        users[idx].emailsSent.push(key);
-        dirty = true;
-      }
+    if (dirty) {
+      await updateUser(user.id, { emailsSent }).catch(() => {});
     }
   }
 
-  if (dirty) writeUsers(users);
-
   return res.status(200).json({
-    ok:       true,
-    checked:  users.filter(u => u.status === 'activo').length,
-    sent:     results.length,
+    ok:      true,
+    checked: users.filter(u => u.status === 'activo').length,
+    sent:    results.length,
     results,
-    runAt:    now.toISOString(),
+    runAt:   now.toISOString(),
   });
 }

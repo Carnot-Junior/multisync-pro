@@ -1,27 +1,18 @@
 /**
- * POST /api/proxypay/callback?secret=<PROXYPAY_WEBHOOK_SECRET>
+ * POST /api/proxypay/callback
  *
  * Webhook assíncrono da Proxypay — chamado quando o estado muda.
  * NÃO requer sessão (é chamado pelo servidor da Proxypay).
- *
- * Payload: { id, status, amount, mobile, pos_id, type,
- *            status_reason, status_datetime, parent_transaction_id }
- *
- * NOTA SANDBOX: Em localhost a Proxypay não consegue chamar este endpoint.
- * Para testar localmente usa ngrok:
- *   ngrok http 3000
- * e actualiza NEXT_PUBLIC_SITE_URL com o URL público do ngrok.
  */
 
-const { readUsers, writeUsers }             = require('../../../lib/auth');
+const { updateUser, createPayment }           = require('../../../lib/auth');
 const { getPending, updatePending,
-        verifyWebhookSecret }               = require('../../../lib/proxypay');
-const { sendEmail, emailWelcome }           = require('../../../lib/email');
+        verifyWebhookSecret }                 = require('../../../lib/proxypay');
+const { sendEmail, emailWelcome }             = require('../../../lib/email');
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  // ── Verificar secret no Authorization header ─────────────────────────────
   if (!verifyWebhookSecret(req)) {
     console.warn('[Proxypay callback] Secret inválido');
     return res.status(401).json({ error: 'Unauthorized' });
@@ -36,50 +27,30 @@ export default async function handler(req, res) {
 
   console.log(`[Proxypay callback] tx=${transactionId} status=${status}`);
 
-  // Só processar se aceite
   if (status !== 'accepted') {
-    updatePending(transactionId, { status: status === 'rejected' ? 'rejected' : 'pending', statusReason: status_reason });
+    await updatePending(transactionId, { status: status === 'rejected' ? 'rejected' : 'pending' });
     return res.status(200).json({ received: true });
   }
 
-  // ── Activar licença ───────────────────────────────────────────────────────
-  const pending = getPending(transactionId);
+  const pending = await getPending(transactionId);
 
   if (!pending) {
     console.warn('[Proxypay callback] Transacção não encontrada:', transactionId);
-    return res.status(200).json({ received: true }); // 200 para Proxypay não reenviar
+    return res.status(200).json({ received: true });
   }
 
   if (pending.status === 'activated') {
     return res.status(200).json({ received: true, alreadyActivated: true });
   }
 
-  const now   = new Date();
-  const users = readUsers();
-  const idx   = users.findIndex(u => u.id === pending.userId);
+  const now        = new Date();
+  let   newExpiresAt;
 
-  if (idx === -1) {
-    console.error('[Proxypay callback] Utilizador não encontrado:', pending.userId);
-    return res.status(200).json({ received: true });
-  }
-
-  const paymentRecord = {
-    date:   now.toISOString(),
-    method: 'proxypay',
-    ref:    transactionId,
-    mobile: payload.mobile,
-    amount: '10.000 Kz',
-    status: 'confirmado',
-    type:   pending.type,
-  };
-
-  const existingPayments = Array.isArray(users[idx].payments) ? users[idx].payments : [];
-
-  let newExpiresAt;
   if (pending.type === 'renewal') {
-    const base = users[idx].expiresAt && new Date(users[idx].expiresAt) > now
-      ? new Date(users[idx].expiresAt)
-      : now;
+    // Precisamos saber a expiração actual — buscar o user
+    const { supabase } = require('../../../lib/supabase');
+    const { data: u } = await supabase.from('users').select('expires_at').eq('id', pending.userId).single();
+    const base = u?.expires_at && new Date(u.expires_at) > now ? new Date(u.expires_at) : now;
     newExpiresAt = new Date(base);
     newExpiresAt.setDate(newExpiresAt.getDate() + 30);
   } else {
@@ -87,23 +58,26 @@ export default async function handler(req, res) {
     newExpiresAt.setDate(newExpiresAt.getDate() + 30);
   }
 
-  users[idx] = {
-    ...users[idx],
+  const updatedUser = await updateUser(pending.userId, {
     status:      'activo',
     expiresAt:   newExpiresAt.toISOString(),
-    activatedAt: users[idx].activatedAt || now.toISOString(),
-    payments:    [...existingPayments, paymentRecord],
-    updatedAt:   now.toISOString(),
-  };
+    activatedAt: now.toISOString(),
+  });
 
-  writeUsers(users);
-  updatePending(transactionId, { status: 'activated', activatedAt: now.toISOString() });
+  await createPayment({
+    userId:     pending.userId,
+    method:     'proxypay',
+    reference:  transactionId,
+    proxypayId: transactionId,
+    amount:     pending.amount || '10000',
+    status:     'confirmado',
+  }).catch(() => {});
 
-  // Email de confirmação
-  sendEmail(emailWelcome(users[idx])).catch(() => {});
+  await updatePending(transactionId, { status: 'activated' });
 
-  console.log(`[Proxypay callback] Licença activada: ${users[idx].email}`);
+  sendEmail(emailWelcome(updatedUser)).catch(() => {});
 
-  // Proxypay precisa de HTTP 200 para não reenviar
+  console.log(`[Proxypay callback] Licença activada: ${updatedUser.email}`);
+
   return res.status(200).json({ received: true, activated: true });
 }
