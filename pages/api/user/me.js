@@ -6,10 +6,10 @@
 
 const { getSessionUser, publicUser } = require('../../../lib/auth');
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
-  const user = getSessionUser(req);
+  const user = await getSessionUser(req);
   if (!user) return res.status(401).json({ message: 'Não autenticado.' });
 
   return res.status(200).json({ user: publicUser(user) });

@@ -5,11 +5,11 @@
 
 const { getTokenFromReq, deleteSession, clearCookie } = require('../../../lib/auth');
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const token = getTokenFromReq(req);
-  if (token) deleteSession(token);
+  if (token) await deleteSession(token);
 
   res.setHeader('Set-Cookie', clearCookie());
   return res.status(200).json({ ok: true });
