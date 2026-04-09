@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 export default function Login() {
   const router = useRouter();
@@ -63,7 +64,6 @@ export default function Login() {
       });
       const data = await res.json();
       if (!res.ok) { setRegError(data.message); return; }
-      // Após registo → página de pagamento
       router.push('/pricing');
     } catch {
       setRegError('Erro de rede. Tenta novamente.');
@@ -72,11 +72,42 @@ export default function Login() {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoginError('');
+    setRegError('');
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        if (tab === 'login') setLoginError(data.message);
+        else setRegError(data.message);
+        return;
+      }
+      router.push('/dashboard');
+    } catch {
+      const msg = 'Erro de rede. Tenta novamente.';
+      if (tab === 'login') setLoginError(msg);
+      else setRegError(msg);
+    }
+  };
+
+  const handleGoogleError = () => {
+    const msg = 'Não foi possível entrar com Google.';
+    if (tab === 'login') setLoginError(msg);
+    else setRegError(msg);
+  };
+
   const inputClass =
     'w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#5b5fff] transition-colors';
 
+  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
+
   return (
-    <>
+    <GoogleOAuthProvider clientId={googleClientId}>
       <Head>
         <title>{tab === 'login' ? 'Entrar' : 'Criar conta'} — MultiSync Pro</title>
       </Head>
@@ -131,6 +162,28 @@ export default function Login() {
             </div>
 
             <div className="p-8">
+
+              {/* Botão Google (comum aos dois tabs) */}
+              {googleClientId && (
+                <div className="mb-6">
+                  <div className="flex justify-center">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={handleGoogleError}
+                      theme="filled_black"
+                      shape="rectangular"
+                      size="large"
+                      text={tab === 'login' ? 'signin_with' : 'signup_with'}
+                      width="368"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3 mt-5 mb-1">
+                    <div className="flex-1 h-px bg-white/10" />
+                    <span className="text-white/30 text-xs">ou continua com email</span>
+                    <div className="flex-1 h-px bg-white/10" />
+                  </div>
+                </div>
+              )}
 
               {/* ── LOGIN ── */}
               {tab === 'login' && (
@@ -305,6 +358,6 @@ export default function Login() {
           </p>
         </div>
       </main>
-    </>
+    </GoogleOAuthProvider>
   );
 }
