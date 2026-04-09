@@ -104,10 +104,8 @@ export default function Login() {
   const inputClass =
     'w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#5b5fff] transition-colors';
 
-  const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
-
   return (
-    <GoogleOAuthProvider clientId={googleClientId}>
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
       <Head>
         <title>{tab === 'login' ? 'Entrar' : 'Criar conta'} — MultiSync Pro</title>
       </Head>
@@ -164,7 +162,7 @@ export default function Login() {
             <div className="p-8">
 
               {/* Botão Google (comum aos dois tabs) */}
-              {googleClientId && (
+              {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
                 <div className="mb-6">
                   <div className="flex justify-center">
                     <GoogleLogin
