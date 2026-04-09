@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+
 export default function Login() {
   const router = useRouter();
   const [tab, setTab] = useState('login'); // 'login' | 'register'
@@ -105,7 +107,7 @@ export default function Login() {
     'w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-white/30 text-sm focus:outline-none focus:border-[#5b5fff] transition-colors';
 
   return (
-    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID || ''}>
       <Head>
         <title>{tab === 'login' ? 'Entrar' : 'Criar conta'} — MultiSync Pro</title>
       </Head>
@@ -162,7 +164,7 @@ export default function Login() {
             <div className="p-8">
 
               {/* Botão Google (comum aos dois tabs) */}
-              {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+              {GOOGLE_CLIENT_ID && (
                 <div className="mb-6">
                   <div className="flex justify-center">
                     <GoogleLogin
